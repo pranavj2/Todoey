@@ -12,29 +12,36 @@ class TodoListViewController: UITableViewController {
     // making itemArray as an Item objetc array
     var itemArray = [Item]()
     
-    let defaults = UserDefaults.standard
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let newItem = Item()
-        newItem.tittle = "Find Mike"
-        itemArray.append(newItem)
-        
-        let newItem2 = Item()
-        newItem2.tittle = "Buy Egos"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.tittle = "Destroy Demogorgans"
-        itemArray.append(newItem3)
         
         
+        print(dataFilePath)
+        
+//        let newItem = Item()
+//        newItem.tittle = "Find Mike"
+//        itemArray.append(newItem)
+//
+//        let newItem2 = Item()
+//        newItem2.tittle = "Buy Egos"
+//        itemArray.append(newItem2)
+//
+//        let newItem3 = Item()
+//        newItem3.tittle = "Destroy Demogorgans"
+//        itemArray.append(newItem3)
+        
+        loadItems()
         
         //set the item array to the array of user defaults to display the data which is newly added
-        if let items = defaults.array(forKey: "Todo list array") as? [Item]{
-            itemArray = items
-        }
+//        if let items = defaults.array(forKey: "Todo list array") as? [Item]{
+//            itemArray = items
+//        }
     }
     
     //MARK - Tableview Datasource Methods
@@ -83,11 +90,9 @@ class TodoListViewController: UITableViewController {
         
         //Optional code for above if else statement
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
+        saveItems()
 
-        
-        tableView.reloadData()
-        
-        
         //checkmark is an accessory type
         //check wheather chekmark is present or not if yes then deselct the checkmark
 //        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark{
@@ -121,10 +126,11 @@ class TodoListViewController: UITableViewController {
             newItem.tittle = textField.text!
             
             self.itemArray.append(newItem)
-            //setting new item into user defaults with forkey
-            self.defaults.set(self.itemArray, forKey: "Todo list array")
+            //setting new item into user defaults with forkey but cant store object
+            //self.defaults.set(self.itemArray, forKey: "Todo list array")
             
-            self.tableView.reloadData()
+            self.saveItems()
+            
         }
         
         alert.addTextField { alertTextField in
@@ -135,7 +141,31 @@ class TodoListViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
     }
     
+    //MARK - Model Manupulation Methods.
     
+    func saveItems() {
+        //to store object inside item class plist
+        let encoder = PropertyListEncoder()
+        
+        do{
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        }catch{
+            print("Error encoding itemArray, \(error)")
+        }
+        self.tableView.reloadData()
+    }
+    
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do{
+            itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error decoding itemArray, \(error)")
+            }
+        }
+    }
 
 }
 

@@ -30,7 +30,9 @@
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="axh-9W-8QK" id="hgD-QS-bnh">
                                     <rect key="frame" x="0.0" y="0.0" width="414" height="43.666667938232422"/>
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <color key="tintColor" systemColor="linkColor"/>
                                 </tableViewCellContentView>
+                                <color key="tintColor" systemColor="linkColor"/>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -40,7 +42,6 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Items" id="4zj-7O-iYX">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="88a-hm-Daz">
-                            <color key="tintColor" systemColor="systemBackgroundColor"/>
                             <connections>
                                 <action selector="addButtenPressed:" destination="8un-yA-ZpJ" id="Xs7-c5-YpX"/>
                             </connections>

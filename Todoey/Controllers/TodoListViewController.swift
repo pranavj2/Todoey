@@ -15,7 +15,9 @@ class TodoListViewController: UITableViewController {
     let realm = try! Realm()
     
     //when we get new value for selectedCategory variable, loadItems() gets called
+    //17. When we set the selected category during the set block
     var selectedCategory: Category? {
+//        18.i.e during the set block
         didSet{
             loadItems()
         }
@@ -63,6 +65,7 @@ class TodoListViewController: UITableViewController {
         if let item = todoItems?[indexPath.row] {
             do{
                 try realm.write {
+                    //update
                     item.done = !item.done
                 }
                 
@@ -72,24 +75,7 @@ class TodoListViewController: UITableViewController {
         }
         
         tableView.reloadData()
-//        todoItems[indexPath.row].done = !todoItems[indexPath.row].done
-//        
-//        saveItems()
 
-        //checkmark is an accessory type
-        //check wheather chekmark is present or not if yes then deselct the checkmark
-//        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark{
-//            //
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-//
-//        }
-//        else{
-//            //when we select a row it will apply checkmark next to it
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-//        }
-        
-        
-        //Deselects a row that an index path identifies, with an option to animate the deselection.
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -111,6 +97,7 @@ class TodoListViewController: UITableViewController {
                         try self.realm.write{
                             let newItem = Item()
                             newItem.title = textField.text!
+                            newItem.dateCreated = Date()
                             currentCategory.items.append(newItem)
                         }
                     }catch {
@@ -145,33 +132,29 @@ class TodoListViewController: UITableViewController {
 
 //MARK: - Search bar methods
 
-//extension TodoListViewController: UISearchBarDelegate {
-//    //to search item from list
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//
-//        let request: NSFetchRequest<Item> = Item.fetchRequest()
-//        //NSPredicate allows us to fire query for database inside swift code
-//        //searchBar variable will take postion of %@ and [cd] is to make query case insensitive
-//        let predicate = NSPredicate(format: "tittle CONTAINS[cd] %@", searchBar.text!)
-//
-//        //to sort the data which we get from database
-//        request.sortDescriptors = [NSSortDescriptor(key: "tittle", ascending: true)]
-//
-//        loadItems(with: request, predicate: predicate)
-//    }
-//
-//    //this method helps to go back to the list after clicking x symbol
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        if searchBar.text?.count == 0 {
-//            loadItems()
-//            //assigns processes to different threads
-//            DispatchQueue.main.async {
-//                //deselect the search bar and removes keypad from screen as soon as we click on x
-//                searchBar.resignFirstResponder()
-//            }
-//
-//
-//        }
-//    }
-//}
-//}
+extension TodoListViewController: UISearchBarDelegate {
+    //to search item from list
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        //Querrying data using realm: -
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "title", ascending: true)
+        
+        tableView.reloadData()
+    }
+
+
+
+    //this method helps to go back to the list after clicking x symbol(when we dismiss searchbar)
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            //assigns processes to different threads
+            DispatchQueue.main.async {
+                //deselect the search bar and removes keypad from screen as soon as we click on x
+                searchBar.resignFirstResponder()
+            }
+
+
+        }
+    }
+}
+
